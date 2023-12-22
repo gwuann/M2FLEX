@@ -1,7 +1,7 @@
 let canvas = document.getElementById("canvas");
 let g = canvas.getContext("2d");
-let uiWindow = createRect( 600,200,300,300);
-let images ={};
+let uiWindow = createRect(600,200,300,300);
+let images = {};
 
 const gamestate_start=0;
 const gamestate_ingame=1;
@@ -50,7 +50,6 @@ function draw() {
     }
 }
 
-
 function createBoardPositions()
 {
     let x= 0;
@@ -90,22 +89,19 @@ function initGame() {
     draw();
 }
 
-
 function drawGameStart() {
     g.fillStyle = "white";
     g.fillText("Click the amount of players to start", uiWindow.x + 10, uiWindow.y + 30);
     for (let i = 0; i < playerAmountButtons.length; i++) {
-        let colors =["blue","yellow","red","green"];
+        let colors = ["blue", "yellow", "red", "green"];
         let button = playerAmountButtons[i];
         g.fillStyle = colors[i];
         g.fillRect(button.x, button.y, button.w, button.h);
         g.fillStyle = "black";
         g.fillText(button.playerAmount.toString(), button.x + 0, button.y + 20);
-        g.drawImage(images["pawn",i+".png"],pos.x,pos.y,pos.w,pos.h)
+        g.drawImage(images["pawn" + i + ".png"], button.x, button.y, button.w, button.h);
     }
 }
-
-
 
 function drawIngame() {
     for(let i =0 ; i<boardPositions.length;i++)
@@ -158,7 +154,56 @@ function loadImages()
 
 function imagesLoaded() {
     initGame();
+    
+    canvas.addEventListener("click",(e)=>{canvasClicked(e)});
+
     draw();
 }
 
 loadImages();
+
+function inRect(px, py, rect) {
+    let result = (px >= rect.x && px <= rect.x2 && py >= rect.y && py <= rect.y2);
+    return result;
+}
+
+function canvasClicked(event) {
+    let mX = event.clientX;
+    let mY = event.clientY;
+
+    for (let i = 0; i < playerAmountButtons.length; i++) {
+        let button = playerAmountButtons[i];
+        let hitButton = inRect(mX, mY, button);
+
+        if (hitButton) {
+            startGame(button.playerAmount);
+            break;
+        }
+    }
+}
+
+function startGame(playerAmount) {
+    gameState = gamestate_ingame;
+    ingameState = ingamestate_start;
+    pawnPositions = [];
+    playerTurn = 0;
+    winner = -1;
+    console.log("Game started with " + playerAmount + " players.");
+
+    for (let i = 0; i < playerAmount; i++) {
+        let pawn = createPawn(i);
+        pawnPositions.push(pawn);
+    }
+
+    draw();
+}
+
+function createPawn(playerI) {
+    
+    let pawn = {
+        playerIndex: playerI,
+        positionIndex: 0, 
+    };
+
+    return pawn;
+}
